@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake game</title>
+
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+
+</head>
+<body>
+
+<div class="all-panel">
+  <label style="align-self: center">Snake Game</label>
+
+  <div class="menu-panel">
+    <button>New game</button>
+    <button>pause</button>
+  </div>
+
+  <div class="game-panel">
+    <div class="info-panel">
+      <label class="info" id="mode">Mode: classic</label><br>
+      <label class="info" id="level">Level: 0</label><br>
+      <label class="info" id="status">Status: play</label><br>
+      <label class="info" id="apples">Apples: 0</label><br>
+      <label class="info" id="steps">Steps: 0</label><br>
+      <label class="info" id="score">Score: 0</label><br>
+      <label class="info" id="best">Best score: 0</label><br>
+<!--      <label class="info" id="time">Time: 0</label><br>-->
+
+    </div>
+
+    <svg class="game-box" id="svg" style="width: 100%; height: 100%"></svg>
+  </div>
+</div>
+
+<script src="js/libs/jquery-3.6.0.js"></script>
+
+<script src="js/levels.js"></script>
+<script src="js/drawer.js"></script>
+<script src="js/game.js"></script>
+<script>
+  new Controller()
+</script>
+
+</body>
+</html>
