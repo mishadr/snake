@@ -43,7 +43,10 @@ class Drawer {
                 this.addSnake(pos)
                 break
             case APPLE:
-                this.addApple(pos)
+                this.addApple(pos, '#ff0000')
+                break
+            case GREEN_APPLE:
+                this.addApple(pos, '#00ff00')
                 break
             default:
                 alert("ERROR")
@@ -140,16 +143,15 @@ class Drawer {
         this.element.appendChild(eye2)
     }
 
-    addApple(pos) {
+    addApple(pos, color) {
         let x = this.getX(pos.x + 0.5)
         let y = this.getY(pos.y + 0.5)
         let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle")
         circle.setAttribute('cx', x)
         circle.setAttribute('cy', y)
         circle.setAttribute('r', this.size / 2 - 2)
-        circle.setAttribute('fill', '#ff0000')
+        circle.setAttribute('fill', color)
         circle.setAttribute('class', `object cell-${this.id(pos)}`)
         this.element.appendChild(circle)
     }
-
 }

@@ -1,6 +1,3 @@
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 class Pos {
     constructor(x, y) {
         this.x = x
@@ -28,10 +25,11 @@ class Pos {
 }
 
 
+WALL = -2
+SNAKE = -1
 FREE = 0
-SNAKE = 1
-APPLE = 2
-WALL = -1
+APPLE = 1
+GREEN_APPLE = 2
 
 class Field {
     constructor(area, snake, drawer) {
@@ -40,9 +38,6 @@ class Field {
         this.height = area[0].length
         this.snake = snake
         this.drawer = drawer
-
-        // TODO
-        this.add(new Pos(5, 4), APPLE)
     }
 
     // Changing cell content
@@ -54,7 +49,7 @@ class Field {
     move(posFrom, posTo, onFree=FREE) {
         this.area[posTo.x][posTo.y] = this.area[posFrom.x][posFrom.y]
         this.area[posFrom.x][posFrom.y] = onFree
-        this.drawer.move('snake', posFrom, posTo)
+        this.drawer.move('field', posFrom, posTo)
     }
 
     free(pos, value=FREE) {
@@ -71,7 +66,7 @@ class Field {
         this.drawer.addSnakeHead(this.snake.body[this.snake.body.length-1], this.snake.speed)
     }
 
-    putApple(pos) {
+    putObject(pos, value) {
         if (pos == null) {
             while (1) {
                 let i = Math.floor(Math.random()*this.width)
@@ -82,7 +77,7 @@ class Field {
                 }
             }
         }
-        this.add(pos, APPLE)
+        this.add(pos, value)
     }
 
     computeSnakeNextPos(speed) {
@@ -108,21 +103,22 @@ class Field {
     step() {
         let pos = this.computeSnakeNextPos()
         this.snake.nextPos = pos
+
         let a = this.area[pos.x][pos.y]
         if (a === WALL || a === SNAKE) {
             console.log('game over!')
             return -1
         }
-        let eat = a === APPLE
-        let tail = this.snake.body[0]
-        if (eat) {
+
+        if (a === APPLE || a === GREEN_APPLE)
             this.free(pos)
-            this.add(pos, SNAKE)
-        }
-        else
-            this.move(tail, pos)
-        this.drawer.moveSnakeHead(pos, this.snake.speed)
-        this.snake.step(eat)
+
+        let [free, busy] = this.snake.step(a)
+        for (const p of free)
+            this.area[p.x][p.y] = FREE
+        for (const p of busy)
+            this.area[p.x][p.y] = SNAKE
+
         return a
     }
 
@@ -179,7 +175,7 @@ class Snake {
             let next = field.computeSnakeNextPos(speed)
             let a = field.area[next.x][next.y]
             // if (!this.isInBody(next)) { // Body
-            if (a === FREE || a === APPLE) { // no crash
+            if (a >= 0) { // no crash
                 this.speed = speed
                 this.drawer.moveSnakeHead(this.headPos, this.speed)
             }
@@ -190,12 +186,33 @@ class Snake {
         }
     }
 
-    step(eat=false) {
+    step(a) {
         this.headPos = this.nextPos
         this.body.push(this.headPos)
-        if (!eat) {
+
+        this.drawer.moveSnakeHead(this.nextPos, this.speed)
+
+        let free = [] // new Positions freed by snake
+        let busy = [this.headPos] // new Positions taken by snake
+        if (a === APPLE) {
+            this.drawer.add(this.headPos, SNAKE)
+        }
+        else if (a === GREEN_APPLE) {
+            // Remove a part of body
+            let cutIndex = Math.floor(this.body.length * 0.3)
+            for (let i=0; i<cutIndex; ++i) {
+                free.push(this.body[i])
+                this.drawer.del('snake', this.body[i])
+            }
+            this.body = this.body.slice(cutIndex)
+            this.drawer.add(this.headPos, SNAKE)
+        }
+        else { // move tail to head
+            free.push(this.body[0])
+            this.drawer.move('snake', this.body[0], this.headPos)
             this.body.shift()
         }
+        return [free, busy]
     }
 }
 
@@ -235,70 +252,4 @@ class Game {
         }
         return success
     }
-}
-
-
-class Controller {
-    constructor() {
-        // localStorage.setItem('a', 2);
-        let a = localStorage.getItem('a')
-        console.log(a)
-
-        this.gamePanel = document.getElementById("svg")
-        this.drawer = new Drawer(this.gamePanel)
-
-        this.game = null
-        // TODO tmp until menu
-        // this.level = new LevelZero()
-        this.level = new LevelClassic()
-
-        this.game = new Game(15, 15, this.level, this.drawer)
-
-        this.isPaused = 'play'
-
-        // Add keys listeners
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'p')
-                this.pause()
-            else if (new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']).has(e.key))
-                this.game.action('turn', e.key)
-
-        })
-
-        this.start()
-    }
-
-    updateInfo() {
-        let bestScore = localStorage.getItem('bestScore')
-        if (this.game.score > bestScore)
-            localStorage.setItem('bestScore', this.game.score)
-
-        document.getElementById("mode").innerText = 'Mode: ' + this.level.name
-        document.getElementById("level").innerText = 'Level: ' + this.level.level
-        document.getElementById("status").innerText = 'Status: ' + this.isPaused
-        document.getElementById("steps").innerText = 'Steps: ' + this.game.steps
-        document.getElementById("apples").innerText = 'Apples: ' + this.game.apples
-        document.getElementById("score").innerText = 'Score: ' + this.game.score
-        document.getElementById("best").innerText = 'Best score: ' + localStorage.getItem('bestScore')
-    }
-
-    pause() {
-        console.log('pause')
-        this.isPaused = this.isPaused === 'play' ? 'pause': 'play'
-        document.getElementById("status").innerText = 'Status: ' + this.isPaused
-    }
-
-    async start() {
-        while (1) {
-            await sleep(this.game.timeInterval)
-            if (this.isPaused !== 'play')
-                continue
-            let success = this.game.step()
-            if (success < 0) {
-                this.isPaused = 'game over'
-            }
-            this.updateInfo()
-        }
-    }
-
 }

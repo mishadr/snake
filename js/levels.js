@@ -14,6 +14,10 @@ class Level {
                 game.drawer.add(new Pos(i, j), area[i][j])
             }
         }
+        let i = Math.floor(game.width/2)
+        let j = Math.floor(game.height/2-2)
+        area[i][j] = APPLE
+        game.drawer.add(new Pos(i, j), area[i][j])
         return area
     }
 
@@ -23,7 +27,13 @@ class Level {
         if (success === APPLE) {
             game.apples += 1
             game.score += 10
-            game.field.putApple()
+            game.field.putObject(null, APPLE)
+            if (game.steps > 10 && Math.random() < 0.02)
+                game.field.putObject(null, GREEN_APPLE)
+        }
+        else if (success === GREEN_APPLE) {
+            game.apples += 1
+            game.score += 30
         }
     }
 }
@@ -63,37 +73,8 @@ class LevelClassic extends Level {
             // Move to next stage
             this.level += 1
             game.timeInterval = this._timeInterval(this.level)
-
         }
 
         super.step(game, success);
     }
 }
-
-
-// CLASSIC_LEVELS = [
-//     new Level(0, [
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-//     ]),
-//     new Level(1, [
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//         [WALL, 0, 0, 0, 0, 0, 0, 0, 0, WALL],
-//     ]),
-// ]

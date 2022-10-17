@@ -19,9 +19,9 @@
 
   <div class="game-panel">
     <div class="info-panel">
+      <label class="info" id="status">Status: play</label><br>
       <label class="info" id="mode">Mode: classic</label><br>
       <label class="info" id="level">Level: 0</label><br>
-      <label class="info" id="status">Status: play</label><br>
       <label class="info" id="apples">Apples: 0</label><br>
       <label class="info" id="steps">Steps: 0</label><br>
       <label class="info" id="score">Score: 0</label><br>
@@ -30,7 +30,12 @@
 
     </div>
 
-    <svg class="game-box" id="svg" style="width: 100%; height: 100%"></svg>
+    <div class="game-box">
+      <svg id="svg" style="width: 100%; height: 100%"></svg>
+      <div class="pause">
+        <label style="vertical-align: middle; ">PAUSED</label>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -39,6 +44,7 @@
 <script src="js/levels.js"></script>
 <script src="js/drawer.js"></script>
 <script src="js/game.js"></script>
+<script src="js/controller.js"></script>
 <script>
   new Controller()
 </script>

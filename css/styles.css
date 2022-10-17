@@ -37,7 +37,22 @@
 .game-box {
     height: 100%;
     background-color: #dedede;
+    position: relative;
     /*margin: 10px;*/
     /*border: 1px solid darkgray;*/
     flex: 4;
+}
+
+.game-box .pause {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(165, 165, 165, 0.9);
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 100px;
+    color: #898989;
+    line-height: 300px;
+    display: none;
 }
