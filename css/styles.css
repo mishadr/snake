@@ -11,6 +11,11 @@
     height: 30px;
     background-color: aliceblue;
     padding: 5px;
+    padding-left: 20px;
+}
+
+.menu-panel button {
+    font-size: 16px;
 }
 
 .game-panel {
